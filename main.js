@@ -6,6 +6,7 @@ const BR = () => dom('br', {});
 const text = (text) => dom('span', {innerText:text});
 
 let nowPage;
+let initialized = false;
 
 plugin.onConfig(tools => {
     let page = dom('div', {})
@@ -16,37 +17,20 @@ plugin.onConfig(tools => {
 });
 
 plugin.onLoad(function () {
+    
+    betterncm.utils.waitForElement("div[class='name f-thide s-fc1 j-flag']").then(result => {
+        if (!initialized) {
+            new MutationObserver((records, observer) => {
+                update();
+            }).observe(document.body.querySelector("div[class='name f-thide s-fc1 j-flag']"), {childList: true});
+            initialized = true;
+        }
+    });
+    
 
     new MutationObserver((records, observer) => {
         if (records[0].addedNodes[0] && records[0].addedNodes[0].className=="g-single") {
-            betterncm.utils.waitForElement('span[class="name j-flag"]').then(span => {
-                const songName = span.innerText;
-                searchSong(songName).then(data => {
-                    if (data == null) return;
-                    songDetails(data).then(descriptions => {
-                        if (document.querySelector(".vi-song-item")) {
-                            document.querySelector(".vi-song-item").remove();
-                        }
-                        let dd1 = dom('dd', {'class': ['inf', 's-fc2', 'vi-song-item']},
-                            dom('span', {innerText:"在VocaDB中查找到记录  ", 'class': ['item', 's-fc1']}),
-                            dom('a', {innerText:"点击查看", 'class': []}),
-                            BR(), BR()
-                        );
-                        dd1.childNodes[1].addEventListener('click', showHidden, false);
-                        descriptions.forEach(description => {
-                            //if (loadedPlugins['MaterialYouTheme']) {
-                            //    description.style.fontFamily = document.getElementsByTagName("body")[0].style.fontFamily;
-                            //}
-                            dd1.appendChild(hideItem(description))
-                        });
-                   
-                        betterncm.utils.waitForElement('div[class="m-comment m-comment-play"]').then(result => {
-                            result.insertBefore(dd1, result.firstChild);
-                        });
-                    });
-                })
-            });
-           
+            update();
         }
     }).observe(document.body, {childList: true});
 
@@ -74,6 +58,37 @@ plugin.onLoad(function () {
         }
     })
 });
+
+function update() {
+    betterncm.utils.waitForElement('span[class="name j-flag"]').then(span => {
+        
+        const songName = span.innerText;
+        searchSong(songName).then(data => {
+            if (data == null) return;
+            songDetails(data).then(descriptions => {
+                if (document.querySelector(".vi-song-item")) {
+                    document.querySelector(".vi-song-item").remove();
+                }
+                let dd1 = dom('dd', {'class': ['inf', 's-fc2', 'vi-song-item']},
+                    dom('span', {innerText:"在VocaDB中查找到记录  ", 'class': ['item', 's-fc1']}),
+                    dom('a', {innerText:"点击查看", 'class': []}),
+                    BR(), BR()
+                );
+                dd1.childNodes[1].addEventListener('click', showHidden, false);
+                descriptions.forEach(description => {
+                    //if (loadedPlugins['MaterialYouTheme']) {
+                    //    description.style.fontFamily = document.getElementsByTagName("body")[0].style.fontFamily;
+                    //}
+                    dd1.appendChild(hideItem(description))
+                });
+           
+                betterncm.utils.waitForElement('div[class="m-comment m-comment-play"]').then(result => {
+                    result.insertBefore(dd1, result.firstChild);
+                });
+            });
+        })
+    });
+}
 async function setArtistHTML(data) {
     betterncm.utils.waitForElement(".m-info-artist").then(result => {
 
@@ -204,7 +219,6 @@ async function songDetails(data) {
 
     // 传说 / 神话
     for (let pool of data.pools) {
-        console.log(pool);
         switch (pool.id) {
             case 30:
                 descriptions.push(BR(), text('NicoNico传说达成'));
@@ -225,7 +239,6 @@ async function songDetails(data) {
             descriptions.push(BR(), text("此歌曲B站数据: "), BR());
             let av = pv.url.split("/").slice(-1)[0];
             let data = await searchVideo(av);
-            console.log(data);
             if (data.code == 0) {
                 data = data.data;
                 

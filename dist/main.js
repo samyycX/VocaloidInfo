@@ -71,6 +71,7 @@
   var BR = () => dom("br", {});
   var text = (text2) => dom("span", { innerText: text2 });
   var nowPage;
+  var initialized = false;
   plugin.onConfig((tools) => {
     let page = dom("div", {});
     page.appendChild(dom("a", { innerText: "\u70B9\u6211\u524D\u5F80 Github \u4ED3\u5E93", onclick: function() {
@@ -83,35 +84,17 @@
     return page;
   });
   plugin.onLoad(function() {
+    betterncm.utils.waitForElement("div[class='name f-thide s-fc1 j-flag']").then((result) => {
+      if (!initialized) {
+        new MutationObserver((records, observer) => {
+          update();
+        }).observe(document.body.querySelector("div[class='name f-thide s-fc1 j-flag']"), { childList: true });
+        initialized = true;
+      }
+    });
     new MutationObserver((records, observer) => {
       if (records[0].addedNodes[0] && records[0].addedNodes[0].className == "g-single") {
-        betterncm.utils.waitForElement('span[class="name j-flag"]').then((span) => {
-          const songName = span.innerText;
-          searchSong(songName).then((data) => {
-            if (data == null)
-              return;
-            songDetails(data).then((descriptions) => {
-              if (document.querySelector(".vi-song-item")) {
-                document.querySelector(".vi-song-item").remove();
-              }
-              let dd1 = dom(
-                "dd",
-                { "class": ["inf", "s-fc2", "vi-song-item"] },
-                dom("span", { innerText: "\u5728VocaDB\u4E2D\u67E5\u627E\u5230\u8BB0\u5F55  ", "class": ["item", "s-fc1"] }),
-                dom("a", { innerText: "\u70B9\u51FB\u67E5\u770B", "class": [] }),
-                BR(),
-                BR()
-              );
-              dd1.childNodes[1].addEventListener("click", showHidden, false);
-              descriptions.forEach((description) => {
-                dd1.appendChild(hideItem(description));
-              });
-              betterncm.utils.waitForElement('div[class="m-comment m-comment-play"]').then((result) => {
-                result.insertBefore(dd1, result.firstChild);
-              });
-            });
-          });
-        });
+        update();
       }
     }).observe(document.body, { childList: true });
     window.addEventListener("hashchange", (event) => {
@@ -134,6 +117,35 @@
       }
     });
   });
+  function update() {
+    betterncm.utils.waitForElement('span[class="name j-flag"]').then((span) => {
+      const songName = span.innerText;
+      searchSong(songName).then((data) => {
+        if (data == null)
+          return;
+        songDetails(data).then((descriptions) => {
+          if (document.querySelector(".vi-song-item")) {
+            document.querySelector(".vi-song-item").remove();
+          }
+          let dd1 = dom(
+            "dd",
+            { "class": ["inf", "s-fc2", "vi-song-item"] },
+            dom("span", { innerText: "\u5728VocaDB\u4E2D\u67E5\u627E\u5230\u8BB0\u5F55  ", "class": ["item", "s-fc1"] }),
+            dom("a", { innerText: "\u70B9\u51FB\u67E5\u770B", "class": [] }),
+            BR(),
+            BR()
+          );
+          dd1.childNodes[1].addEventListener("click", showHidden, false);
+          descriptions.forEach((description) => {
+            dd1.appendChild(hideItem(description));
+          });
+          betterncm.utils.waitForElement('div[class="m-comment m-comment-play"]').then((result) => {
+            result.insertBefore(dd1, result.firstChild);
+          });
+        });
+      });
+    });
+  }
   async function setArtistHTML(data) {
     betterncm.utils.waitForElement(".m-info-artist").then((result) => {
       let dd1 = dom(
@@ -238,7 +250,6 @@
     let descriptions = [];
     descriptions.push(text(`\u6B4C\u66F2\u7C7B\u578B: ${data.song.songType}`), BR());
     for (let pool of data.pools) {
-      console.log(pool);
       switch (pool.id) {
         case 30:
           descriptions.push(BR(), text("NicoNico\u4F20\u8BF4\u8FBE\u6210"));
@@ -258,7 +269,6 @@
         descriptions.push(BR(), text("\u6B64\u6B4C\u66F2B\u7AD9\u6570\u636E: "), BR());
         let av = pv.url.split("/").slice(-1)[0];
         let data2 = await searchVideo(av);
-        console.log(data2);
         if (data2.code == 0) {
           data2 = data2.data;
           let view = data2.stat.view;
