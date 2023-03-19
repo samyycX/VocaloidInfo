@@ -21,7 +21,10 @@ plugin.onLoad(function () {
     betterncm.utils.waitForElement("div[class='name f-thide s-fc1 j-flag']").then(result => {
         if (!initialized) {
             new MutationObserver((records, observer) => {
-                update();
+                betterncm.utils.waitForElement('span[class="name j-flag"]').then(span => {
+                    document.querySelectorAll(".vi-song-item").forEach(node => node.remove());
+                });
+                debouncedUpdate();
             }).observe(document.body.querySelector("div[class='name f-thide s-fc1 j-flag']"), {childList: true});
             initialized = true;
         }
@@ -30,7 +33,7 @@ plugin.onLoad(function () {
 
     new MutationObserver((records, observer) => {
         if (records[0].addedNodes[0] && records[0].addedNodes[0].className=="g-single") {
-            update();
+            debouncedUpdate();
         }
     }).observe(document.body, {childList: true});
 
@@ -59,16 +62,19 @@ plugin.onLoad(function () {
     })
 });
 
+let debouncedUpdate = betterncm.utils.debounce(update, 500);
+
 function update() {
     betterncm.utils.waitForElement('span[class="name j-flag"]').then(span => {
         
+        if (document.querySelector(".vi-song-item")) {
+            document.querySelectorAll(".vi-song-item").forEach(node => node.remove());
+        }
+
         const songName = span.innerText;
         searchSong(songName).then(data => {
             if (data == null) return;
             songDetails(data).then(descriptions => {
-                if (document.querySelector(".vi-song-item")) {
-                    document.querySelector(".vi-song-item").remove();
-                }
                 let dd1 = dom('dd', {'class': ['inf', 's-fc2', 'vi-song-item']},
                     dom('span', {innerText:"在VocaDB中查找到记录  ", 'class': ['item', 's-fc1']}),
                     dom('a', {innerText:"点击查看", 'class': []}),
@@ -82,6 +88,7 @@ function update() {
                     dd1.appendChild(hideItem(description))
                 });
            
+
                 betterncm.utils.waitForElement('div[class="m-comment m-comment-play"]').then(result => {
                     result.insertBefore(dd1, result.firstChild);
                 });
