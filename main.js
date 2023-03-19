@@ -7,6 +7,14 @@ const text = (text) => dom('span', {innerText:text});
 
 let nowPage;
 
+plugin.onConfig(tools => {
+    let page = dom('div', {})
+    page.appendChild(dom('a', {innerText:"点我前往 Github 仓库", onclick: function() {betterncm.ncm.openUrl("https://github.com/samyycX/VocaloidInfo")}}));
+    page.appendChild(BR());
+    page.appendChild(dom('a', {innerText:"点我反馈本插件的问题", onclick: function() {betterncm.ncm.openUrl("https://github.com/samyycX/VocaloidInfo/issues")}}))
+    return page;
+});
+
 plugin.onLoad(function () {
 
     new MutationObserver((records, observer) => {

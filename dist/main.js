@@ -44,6 +44,7 @@
         if (element.classList != void 0) {
           element.classList.remove("inf", "s-fc1");
         }
+        console.log(element);
         if (element.hasChildNodes) {
           element.childNodes.forEach((child) => {
             child.style.fontFamily = document.getElementsByTagName("body")[0].style.fontFamily;
@@ -52,6 +53,7 @@
           });
         }
       }
+      console.log(element);
       father.appendChild(element);
     });
     return father;
@@ -69,6 +71,17 @@
   var BR = () => dom("br", {});
   var text = (text2) => dom("span", { innerText: text2 });
   var nowPage;
+  plugin.onConfig((tools) => {
+    let page = dom("div", {});
+    page.appendChild(dom("a", { innerText: "\u70B9\u6211\u524D\u5F80 Github \u4ED3\u5E93", onclick: function() {
+      betterncm.ncm.openUrl("https://github.com/samyycX/VocaloidInfo");
+    } }));
+    page.appendChild(BR());
+    page.appendChild(dom("a", { innerText: "\u70B9\u6211\u53CD\u9988\u672C\u63D2\u4EF6\u7684\u95EE\u9898", onclick: function() {
+      betterncm.ncm.openUrl("https://github.com/samyycX/VocaloidInfo/issues");
+    } }));
+    return page;
+  });
   plugin.onLoad(function() {
     new MutationObserver((records, observer) => {
       if (records[0].addedNodes[0] && records[0].addedNodes[0].className == "g-single") {
@@ -225,6 +238,7 @@
     let descriptions = [];
     descriptions.push(text(`\u6B4C\u66F2\u7C7B\u578B: ${data.song.songType}`), BR());
     for (let pool of data.pools) {
+      console.log(pool);
       switch (pool.id) {
         case 30:
           descriptions.push(BR(), text("NicoNico\u4F20\u8BF4\u8FBE\u6210"));
@@ -244,6 +258,7 @@
         descriptions.push(BR(), text("\u6B64\u6B4C\u66F2B\u7AD9\u6570\u636E: "), BR());
         let av = pv.url.split("/").slice(-1)[0];
         let data2 = await searchVideo(av);
+        console.log(data2);
         if (data2.code == 0) {
           data2 = data2.data;
           let view = data2.stat.view;
