@@ -5,7 +5,6 @@ export function addMaterialYouStyle(father, ...elements) {
             if (element.classList != undefined) {
                 element.classList.remove("inf", "s-fc1");
             }
-            console.log(element);
             //element.setAttribute("color: var(--md-accent-color-secondary);")
             if (element.hasChildNodes) {
                 element.childNodes.forEach(child => {
@@ -16,7 +15,6 @@ export function addMaterialYouStyle(father, ...elements) {
             }
             
         }
-        console.log(element);
         father.appendChild(element);
     });
     return father;

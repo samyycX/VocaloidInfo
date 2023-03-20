@@ -24,7 +24,7 @@ plugin.onLoad(function () {
                 betterncm.utils.waitForElement('span[class="name j-flag"]').then(span => {
                     document.querySelectorAll(".vi-song-item").forEach(node => node.remove());
                 });
-                debouncedUpdate();
+                debouncedSongUpdate();
             }).observe(document.body.querySelector("div[class='name f-thide s-fc1 j-flag']"), {childList: true});
             initialized = true;
         }
@@ -32,8 +32,8 @@ plugin.onLoad(function () {
     
 
     new MutationObserver((records, observer) => {
-        if (records[0].addedNodes[0] && records[0].addedNodes[0].className=="g-single") {
-            debouncedUpdate();
+        if (records[0].addedNodes[0] && records[0].addedNodes[0].className.includes("g-single")) {
+            debouncedSongUpdate();
         }
     }).observe(document.body, {childList: true});
 
@@ -42,29 +42,33 @@ plugin.onLoad(function () {
         const url = new URL(event.newURL);
         if(url.hash.startsWith("#/m/artist/?")) {
             nowPage = url.hash;
-            betterncm.utils.waitForElement(".name-artist").then(result => {
-                const name = result.querySelector(".f-ust").innerText;
-                
-                searchArtist(name).then(data => {
-                    // 防止快速切换时显示错误
-                    if (url.hash != nowPage) return;
-                    // 防止显示两次
-                    if (document.getElementsByClassName("vi-hidden-item").length != 0) return;
-                    if (data != null) {
-                        //addMaterialYouStyle(result, data);
-                        setArtistHTML(data);
-                        displayed = true;
-                    }
-                })
-
-            });
+           debouncedArtistUpdate();
         }
     })
 });
 
-let debouncedUpdate = betterncm.utils.debounce(update, 500);
+let debouncedArtistUpdate = betterncm.utils.debounce(() => {
+    betterncm.utils.waitForElement(".name-artist").then(result => {
+        const name = result.querySelector(".f-ust").innerText;
+        
+        searchArtist(name).then(data => {
+            // 防止快速切换时显示错误
+            //if (url.hash != nowPage) return;
+            // 防止显示两次
+            if (document.getElementsByClassName("vi-hidden-item").length != 0) return;
+            if (data != null) {
+                //addMaterialYouStyle(result, data);
+                setArtistHTML(data);
+                displayed = true;
+            }
+        })
 
-function update() {
+    });
+}, 400);
+
+let debouncedSongUpdate = betterncm.utils.debounce(updateSong, 400);
+
+function updateSong() {
     betterncm.utils.waitForElement('span[class="name j-flag"]').then(span => {
         
         if (document.querySelector(".vi-song-item")) {
@@ -76,17 +80,22 @@ function update() {
             if (data == null) return;
             songDetails(data).then(descriptions => {
                 let dd1 = dom('dd', {'class': ['inf', 's-fc2', 'vi-song-item']},
-                    dom('span', {innerText:"在VocaDB中查找到记录  ", 'class': ['item', 's-fc1']}),
-                    dom('a', {innerText:"点击查看", 'class': []}),
+                    dom('span', {innerText:"在VocaDB中查找到记录  ", 'class': ['item', 's-fc1', 'mq-yahei'], style: {"font-size": "13px"}}),
+                    dom('a', {innerText:"点击查看", 'class': ["mq-yahei"], style: {"font-size": "13px"}}),
                     BR(), BR()
                 );
                 dd1.childNodes[1].addEventListener('click', showHidden, false);
                 descriptions.forEach(description => {
+                    description = hideItem(description);
+                    description.classList.add("mq-yahei");
+                    description.style.fontSize = "13px";
                     //if (loadedPlugins['MaterialYouTheme']) {
-                    //    description.style.fontFamily = document.getElementsByTagName("body")[0].style.fontFamily;
+                        //description.style.fontFamily = document.getElementsByTagName("body")[0].style.fontFamily;
                     //}
-                    dd1.appendChild(hideItem(description))
+                    dd1.appendChild(description);
                 });
+                dd1.appendChild(hideItem(BR()));
+                dd1.appendChild(hideItem(BR()));
            
 
                 betterncm.utils.waitForElement('div[class="m-comment m-comment-play"]').then(result => {
@@ -124,11 +133,6 @@ async function setArtistHTML(data) {
                 dd1.appendChild(hideItem(text(`类型: ${data.artistType}`)));
                 dd1.appendChild(BR());
                 dd1.appendChild(hideItem(text(`简介: ${data.description.original}`)));
-        }
-        if (data.artistType == "Producer") {
-            
-        } else {
-            
         }
 
         addMaterialYouStyle(result ,dd1)
@@ -223,27 +227,36 @@ function vocaloidDetails(data) {
 async function songDetails(data) {
     let descriptions = [];
     descriptions.push(text(`歌曲类型: ${data.song.songType}`), BR());
+    const date = new Date(data.song.publishDate);
+    descriptions.push(text(`发布日期: ${date.getFullYear()}年${date.getMonth()}月${date.getDay()}日`), BR());
 
     // 传说 / 神话
     for (let pool of data.pools) {
         switch (pool.id) {
             case 30:
-                descriptions.push(BR(), text('NicoNico传说达成'));
+                descriptions.push(BR(), dom('span', {innerText:'NicoNico传说达成', 'style':{'color':'#FFD700'}}));
                 break;
             case 2665:
-                descriptions.push(BR(), text('Youtube传说达成'));
+                descriptions.push(BR(), dom('span', {innerText:'Youtube传说达成', 'style':{'color':'#FFD700'}}));
                 break;
             case 6477:
-                descriptions.push(BR(), text('NicoNico神话达成'));
+                descriptions.push(BR(), dom('span', {innerText:'NicoNico神话达成', 'style':{'color':'#FF4D4D'}}));
                 break;
             case 6478:
-                descriptions.push(BR(), text('Youtube神话达成'));
+                descriptions.push(BR(), dom('span', {innerText:'Youtube神话达成', 'style':{'color':'#FF4D4D'}}));
         }
+    }
+
+    if (data.alternateVersions.length != 0) {
+        descriptions.push(BR(), text("其他版本 (翻调/翻唱/Remix):"))
+        data.alternateVersions.forEach(version => {
+            descriptions.push(BR(), text(`${version.name} (${version.songType}) - ${version.artistString}`));
+        });
     }
 
     for (let pv of data.pvs) {
         if (pv.service == "Bilibili") {
-            descriptions.push(BR(), text("此歌曲B站数据: "), BR());
+            descriptions.push(BR(), BR(), text("此歌曲B站数据: "), BR());
             let av = pv.url.split("/").slice(-1)[0];
             let data = await searchVideo(av);
             if (data.code == 0) {
@@ -252,9 +265,9 @@ async function songDetails(data) {
                 let view = data.stat.view;
                 
                 if (view >= 10000000) {
-                    descriptions.push(text(`播放量 ${view} (神话)`));
+                    descriptions.push(dom('span', {innerText:`播放量 ${view} (神话)`, 'style':{'color':'#FF4D4D'}}));
                 } else if (view >= 1000000) {
-                    descriptions.push(text(`播放量 ${view} (传说)`));
+                    descriptions.push(dom('span', {innerText:`播放量 ${view} (传说)`, 'style':{'color':'#FFD700'}}));
                 } else {
                     descriptions.push(text(`播放量 ${view}`));
                 }

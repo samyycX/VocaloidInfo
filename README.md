@@ -6,10 +6,10 @@
 - 显示歌姬的信息
 - 在歌曲下显示传说/神话信息 或 B站详细视频信息 (如果有的话) (暂不兼容RefinedNowPlaying)
 - 兼容Material You
+- 兼容RefinedNowPlaying
 
 # 缺点
 - VocaDB数据不完善
-- 不兼容RefinedNowPlaying (应该很快会解决)
 - 功能少
 
 # Contributing
