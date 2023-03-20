@@ -193,7 +193,7 @@ function vocaloidDetails(data) {
     descriptions.push(BR(), text(`所属公司: ${data.groups.map(g => g.defaultName).join(", ")}`), BR());
     descriptions.push(text(`画师: ${data.illustrators.map(i => i.defaultName).join(", ")}`), BR());
     const date = new Date(data.releaseDate);
-    descriptions.push(text(`发布日期: ${date.getFullYear()}年${date.getMonth()}月${date.getDay()}日`), BR());
+    descriptions.push(text(`发布日期: ${date.getFullYear()}年${date.getMonth()+1}月${date.getDate()}日`), BR());
     descriptions.push(text(`声源: ${data.voiceProviders.map(v => v.name).join(", ")}`), BR());
 
     descriptions.push(BR());
@@ -228,7 +228,7 @@ async function songDetails(data) {
     let descriptions = [];
     descriptions.push(text(`歌曲类型: ${data.song.songType}`), BR());
     const date = new Date(data.song.publishDate);
-    descriptions.push(text(`发布日期: ${date.getFullYear()}年${date.getMonth()}月${date.getDay()}日`), BR());
+    descriptions.push(text(`发布日期: ${date.getFullYear()}年${date.getMonth()+1}月${date.getDate()}日`), BR());
 
     // 传说 / 神话
     for (let pool of data.pools) {
@@ -268,6 +268,8 @@ async function songDetails(data) {
                     descriptions.push(dom('span', {innerText:`播放量 ${view} (神话)`, 'style':{'color':'#FF4D4D'}}));
                 } else if (view >= 1000000) {
                     descriptions.push(dom('span', {innerText:`播放量 ${view} (传说)`, 'style':{'color':'#FFD700'}}));
+                } else if (view >= 100000) {
+                    descriptions.push(dom('span', {innerText:`播放量 ${view} (殿堂)`, 'style':{'color':'#66CCFF'}}));
                 } else {
                     descriptions.push(text(`播放量 ${view}`));
                 }
