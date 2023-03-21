@@ -16,3 +16,7 @@ export async function searchSong(name) {
     if (datas.items[0] == undefined) return null;
     return await get(`songs/${datas.items[0].id}/details`)
 }
+
+export async function getSongById(id) {
+    return await get(`songs/${id}/details`)
+}
