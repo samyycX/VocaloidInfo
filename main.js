@@ -1,12 +1,16 @@
-import { searchArtist, searchSong } from './vocadb.js';
+import { getSongById, searchArtist, searchSong } from './vocadb.js';
 import { searchVideo } from './bilibili.js';
 import { addMaterialYouStyle, getChineseNameFromNames } from './utils.js';
+// 这个文件主要是为了处理一些歌名格式不统一导致搜索不到的问题，所以只能使用强制覆盖方式来修正
+import overrideData from './override.json' assert { type: 'JSON' }
 
 const BR = () => dom('br', {});
 const text = (text) => dom('span', {innerText:text});
 
 let nowPage;
 let initialized = false;
+
+const overrideMap = new Map(Object.entries(overrideData));
 
 plugin.onConfig(tools => {
     let page = dom('div', {})
@@ -75,8 +79,17 @@ function updateSong() {
             document.querySelectorAll(".vi-song-item").forEach(node => node.remove());
         }
 
-        const songName = span.innerText;
-        searchSong(songName).then(data => {
+        const songName = span.innerText.slice(0, -2);
+
+        let promise;
+
+        if (overrideMap.has(songName)) {
+            promise = getSongById(overrideMap.get(songName));
+        } else {
+            promise = searchSong(songName);
+        }
+
+        promise.then(data => {
             if (data == null) return;
             songDetails(data).then(descriptions => {
                 let dd1 = dom('dd', {'class': ['inf', 's-fc2', 'vi-song-item']},
