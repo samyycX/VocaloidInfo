@@ -36,7 +36,7 @@ plugin.onLoad(function () {
     
 
     new MutationObserver((records, observer) => {
-        if (records[0].addedNodes[0] && records[0].addedNodes[0].className.includes("g-single")) {
+        if (records[0].addedNodes[0] && records[0].addedNodes[0].className && records[0].addedNodes[0].className.includes("g-single")) {
             debouncedSongUpdate();
         }
     }).observe(document.body, {childList: true});
@@ -79,7 +79,9 @@ function updateSong() {
             document.querySelectorAll(".vi-song-item").forEach(node => node.remove());
         }
 
-        const songName = span.innerText.slice(0, -2);
+        // 去除最后所有的空格..
+        const songName = span.innerText.replace(/(\s*$)/g, "");
+        //console.log(songName);
 
         let promise;
 
