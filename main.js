@@ -5,7 +5,7 @@ import { addMaterialYouStyle, getChineseNameFromNames } from './utils.js';
 import overrideData from './override.json' assert { type: 'JSON' }
 
 const BR = () => dom('br', {});
-const text = (text) => dom('span', {innerText:text});
+const text = (text) => dom('span', {innerText:text, 'style':{'-webkit-user-select':'text'}});
 
 let nowPage;
 let initialized = false;
@@ -21,6 +21,8 @@ plugin.onConfig(tools => {
 });
 
 plugin.onLoad(function () {
+
+    //initCache();
     
     betterncm.utils.waitForElement("div[class='name f-thide s-fc1 j-flag']").then(result => {
         if (!initialized) {
@@ -72,53 +74,58 @@ let debouncedArtistUpdate = betterncm.utils.debounce(() => {
 
 let debouncedSongUpdate = betterncm.utils.debounce(updateSong, 400);
 
-function updateSong() {
-    betterncm.utils.waitForElement('span[class="name j-flag"]').then(span => {
+async function updateSong() {
+    let title = await betterncm.utils.waitForElement('span[class="name j-flag"]');//.then(span => {
+    let artists = await betterncm.utils.waitForElement('li[class="f-thide f-ust f-ust-1"]');
         
-        if (document.querySelector(".vi-song-item")) {
-            document.querySelectorAll(".vi-song-item").forEach(node => node.remove());
-        }
+    if (document.querySelector(".vi-song-item")) {
+        document.querySelectorAll(".vi-song-item").forEach(node => node.remove());
+    }
 
-        // 去除最后所有的空格..
-        const songName = span.innerText.replace(/(\s*$)/g, "");
-        //console.log(songName);
+    // 去除最后所有的空格..
+    const songName = title.innerText.replace(/(\s*$)/g, "");
+    //console.log(songName);
+    let artistsName = [];
+    artists.childNodes.forEach(child => {
+        if (child.title) artistsName.push(child.title);
+    })
+    //console.log(artistsName);
 
-        let promise;
+    let promise;
 
-        if (overrideMap.has(songName)) {
-            promise = getSongById(overrideMap.get(songName));
-        } else {
-            promise = searchSong(songName);
-        }
+    if (overrideMap.has(songName)) {
+        promise = getSongById(overrideMap.get(songName));
+    } else {
+        promise = searchSong(songName, artistsName);
+    }
 
-        promise.then(data => {
-            if (data == null) return;
-            songDetails(data).then(descriptions => {
-                let dd1 = dom('dd', {'class': ['inf', 's-fc2', 'vi-song-item']},
-                    dom('span', {innerText:"在VocaDB中查找到记录  ", 'class': ['item', 's-fc1', 'mq-yahei'], style: {"font-size": "13px"}}),
-                    dom('a', {innerText:"点击查看", 'class': ["mq-yahei"], style: {"font-size": "13px"}}),
-                    BR(), BR()
-                );
-                dd1.childNodes[1].addEventListener('click', showHidden, false);
-                descriptions.forEach(description => {
-                    description = hideItem(description);
-                    description.classList.add("mq-yahei");
-                    description.style.fontSize = "13px";
-                    //if (loadedPlugins['MaterialYouTheme']) {
-                        //description.style.fontFamily = document.getElementsByTagName("body")[0].style.fontFamily;
-                    //}
-                    dd1.appendChild(description);
-                });
-                dd1.appendChild(hideItem(BR()));
-                dd1.appendChild(hideItem(BR()));
-           
-
-                betterncm.utils.waitForElement('div[class="m-comment m-comment-play"]').then(result => {
-                    result.insertBefore(dd1, result.firstChild);
-                });
+    promise.then(data => {
+        if (data == null) return;
+        songDetails(data).then(descriptions => {
+            let dd1 = dom('dd', {'class': ['inf', 's-fc2', 'vi-song-item']},
+                dom('span', {innerText:"在VocaDB中查找到记录  ", 'class': ['item', 's-fc1', 'mq-yahei'], style: {"font-size": "13px"}}),
+                dom('a', {innerText:"点击查看", 'class': ["mq-yahei"], style: {"font-size": "13px"}}),
+                BR(), BR()
+            );
+            dd1.childNodes[1].addEventListener('click', showHidden, false);
+            descriptions.forEach(description => {
+                description = hideItem(description);
+                description.classList.add("mq-yahei");
+                description.style.fontSize = "13px";
+                //if (loadedPlugins['MaterialYouTheme']) {
+                    //description.style.fontFamily = document.getElementsByTagName("body")[0].style.fontFamily;
+                //}
+                dd1.appendChild(description);
             });
-        })
-    });
+            dd1.appendChild(hideItem(BR()));
+            dd1.appendChild(hideItem(BR()));
+        
+
+            betterncm.utils.waitForElement('div[class="m-comment m-comment-play"]').then(result => {
+                result.insertBefore(dd1, result.firstChild);
+            });
+        });
+    })
 }
 async function setArtistHTML(data) {
     betterncm.utils.waitForElement(".m-info-artist").then(result => {
