@@ -3,6 +3,7 @@ import { searchVideo } from './bilibili.js';
 import { addMaterialYouStyle, getChineseNameFromNames } from './utils.js';
 // 这个文件主要是为了处理一些歌名格式不统一导致搜索不到的问题，所以只能使用强制覆盖方式来修正
 import overrideData from './override.json' assert { type: 'JSON' }
+import * as component from './component.js';
 
 const BR = () => dom('br', {});
 const text = (text) => dom('span', {innerText:text, 'style':{'-webkit-user-select':'text'}});
@@ -102,12 +103,12 @@ async function updateSong() {
     promise.then(data => {
         if (data == null) return;
         songDetails(data).then(descriptions => {
-            let dd1 = dom('dd', {'class': ['inf', 's-fc2', 'vi-song-item']},
+            let dd1 = dom('dd', {'class': ['inf', 's-fc2', 'vi-song-item'], id:'vi-control'},
                 dom('span', {innerText:"在VocaDB中查找到记录  ", 'class': ['item', 's-fc1', 'mq-yahei'], style: {"font-size": "13px"}}),
-                dom('a', {innerText:"点击查看", 'class': ["mq-yahei"], style: {"font-size": "13px"}}),
+                dom('a', {innerText:"查看信息", 'class': ["mq-yahei"], style: {"font-size": "13px"}}),
                 BR(), BR()
             );
-            dd1.childNodes[1].addEventListener('click', showHidden, false);
+            dd1.childNodes[1].addEventListener('click', switchHidden, false);
             descriptions.forEach(description => {
                 description = hideItem(description);
                 description.classList.add("mq-yahei");
@@ -130,12 +131,12 @@ async function updateSong() {
 async function setArtistHTML(data) {
     betterncm.utils.waitForElement(".m-info-artist").then(result => {
 
-        let dd1 = dom('dd', {'class': ['inf', 's-fc2']},
+        let dd1 = dom('dd', {'class': ['inf', 's-fc2'], 'id':'vi-control'},
             dom('span', {innerText:"在VocaDB中查找到记录  ", 'class': ['item', 's-fc1']}),
-            dom('a', {innerText:"点击查看"}),
+            dom('a', {innerText:"查看信息"}),
             BR(), BR()
         );
-        dd1.childNodes[1].addEventListener('click', showHidden, false);
+        dd1.childNodes[1].addEventListener('click', switchHidden, false);
        
         switch (data.artistType) {
             case "Producer":
@@ -252,20 +253,31 @@ async function songDetails(data) {
     const date = new Date(data.song.publishDate);
     descriptions.push(text(`发布日期: ${date.getFullYear()}年${date.getMonth()+1}月${date.getDate()}日`), BR());
 
+    let info = await betterncm.utils.waitForElement("div[class='info']");
+    let achievementsLine = dom('h2', {'class':['u-tit','f-ff2','f-thide','s-fc4']});
+    achievementsLine.style.marginLeft = "0";
+    achievementsLine.style.display = "flex";
+    achievementsLine.style.alignItems = "center";
+    achievementsLine.style.height = "auto";
+
     // 传说 / 神话
     for (let pool of data.pools) {
         switch (pool.id) {
             case 30:
-                descriptions.push(BR(), dom('span', {innerText:'NicoNico传说达成', 'style':{'color':'#FFD700'}}));
+                //descriptions.push(BR(), dom('span', {innerText:'NicoNico传说达成', 'style':{'color':'#FFD700'}}));
+                achievementsLine.appendChild(component.Niconico1);
                 break;
             case 2665:
-                descriptions.push(BR(), dom('span', {innerText:'Youtube传说达成', 'style':{'color':'#FFD700'}}));
+                //descriptions.push(BR(), dom('span', {innerText:'Youtube传说达成', 'style':{'color':'#FFD700'}}));
+                achievementsLine.appendChild(component.Youtube1);
                 break;
             case 6477:
-                descriptions.push(BR(), dom('span', {innerText:'NicoNico神话达成', 'style':{'color':'#FF4D4D'}}));
+                //descriptions.push(BR(), dom('span', {innerText:'NicoNico神话达成', 'style':{'color':'#FF4D4D'}}));
+                achievementsLine.appendChild(component.Niconico2);
                 break;
             case 6478:
-                descriptions.push(BR(), dom('span', {innerText:'Youtube神话达成', 'style':{'color':'#FF4D4D'}}));
+                //descriptions.push(BR(), dom('span', {innerText:'Youtube神话达成', 'style':{'color':'#FF4D4D'}}));
+                achievementsLine.appendChild(component.Youtube2);
         }
     }
 
@@ -287,13 +299,17 @@ async function songDetails(data) {
                 let view = data.stat.view;
                 
                 if (view >= 10000000) {
-                    descriptions.push(dom('span', {innerText:`播放量 ${view} (神话)`, 'style':{'color':'#FF4D4D'}}));
+                    achievementsLine.appendChild(component.Bilibili3);
+                    //descriptions.push(dom('span', {innerText:`播放量 ${view} (神话)`, 'style':{'color':'#FF4D4D'}}));
                 } else if (view >= 1000000) {
-                    descriptions.push(dom('span', {innerText:`播放量 ${view} (传说)`, 'style':{'color':'#FFD700'}}));
+                    achievementsLine.appendChild(component.Bilibili2);
+                    //descriptions.push(dom('span', {innerText:`播放量 ${view} (传说)`, 'style':{'color':'#FFD700'}}));
                 } else if (view >= 100000) {
-                    descriptions.push(dom('span', {innerText:`播放量 ${view} (殿堂)`, 'style':{'color':'#66CCFF'}}));
+                    achievementsLine.appendChild(component.Bilibili1);
+                    //descriptions.push(dom('span', {innerText:`播放量 ${view} (殿堂)`, 'style':{'color':'#66CCFF'}}));
                 } else {
-                    descriptions.push(text(`播放量 ${view}`));
+                    achievementsLine.appendChild(component.Bilibili4(view));
+                    //descriptions.push(text(`播放量 ${view}`));
                 }
                 descriptions.push(BR());
 
@@ -317,6 +333,13 @@ async function songDetails(data) {
         }
     }
 
+    // 设置间距
+    for (let node of Array(...achievementsLine.children).slice()) {
+        node.style.marginRight = "5px";
+    }
+
+    info.insertBefore(achievementsLine, info.firstChild);
+
     return descriptions;
 
     
@@ -328,9 +351,24 @@ function hideItem(element) {
     return element;
 }
 
-function showHidden() {
+function switchHidden() {
+
+    let vicontrol = document.getElementById("vi-control");
     const hiddenItems = document.getElementsByClassName("vi-hidden-item");
-    for (let i = 0; i < hiddenItems.length; i++) {
-        hiddenItems.item(i).hidden = false;
+
+    if (vicontrol.classList.contains("vi-hidden-displayed")) {
+        
+        for (let i = 0; i < hiddenItems.length; i++) {
+            hiddenItems.item(i).hidden = true;
+        }
+        vicontrol.classList.remove("vi-hidden-displayed");
+        vicontrol.childNodes[1].innerText = "查看信息";
+    } else {
+        for (let i = 0; i < hiddenItems.length; i++) {
+            hiddenItems.item(i).hidden = false;
+        }
+        vicontrol.classList.add("vi-hidden-displayed");
+        vicontrol.childNodes[1].innerText = "隐藏信息";
     }
+    
 }

@@ -13,6 +13,13 @@ export async function searchArtist(name) {
 
 export async function searchSong(name, artistsName) {
 
+    let url = `songs?query=${name}&sort=SongType&childVoicebanks=true&nameMatchMode=Partial`;
+    const datas = await get(url);
+    if (datas.items[0] == undefined) return null;
+    return getSongById(datas.items[0].id);
+
+    //暂时停用此功能
+    /*
     // 获取歌的原名 (删除feat. remix等等信息)
     let result = /(.*)\s\(.*\)/g.exec(name);
     name = result == null ? name : result[1];
@@ -33,6 +40,7 @@ export async function searchSong(name, artistsName) {
     const datas = await get(url);
     if (datas.items[0] == undefined) return null;
     return getSongById(datas.items[0].id);
+     */
 }
 
 export async function getSongById(id) {
