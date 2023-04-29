@@ -140,7 +140,7 @@ export const Bilibili1 = createNode(`
             margin-left: 5px;
         }
     </style>
-    <img src="https://www.bilibili.com/favicon.ico" width="32px" height="32px"/>
+    <img src="https://www.bilibili.com/favicon.ico" width="16px" height="16px"/>
     <p>殿堂</p>
 </b>
 `);
