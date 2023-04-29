@@ -1,6 +1,6 @@
 import { getSongById, searchArtist, searchSong } from './vocadb.js';
 import { searchVideo } from './bilibili.js';
-import { addMaterialYouStyle, getChineseNameFromNames } from './utils.js';
+import { addMaterialYouStyle, getChineseNameFromNames, injectCSS } from './utils.js';
 // 这个文件主要是为了处理一些歌名格式不统一导致搜索不到的问题，所以只能使用强制覆盖方式来修正
 import overrideData from './override.json' assert { type: 'JSON' }
 import * as component from './component.js';
@@ -37,6 +37,7 @@ plugin.onLoad(function () {
         }
     });
     
+    injectCSS();
 
     new MutationObserver((records, observer) => {
         if (records[0].addedNodes[0] && records[0].addedNodes[0].className && records[0].addedNodes[0].className.includes("g-single")) {
@@ -57,7 +58,7 @@ plugin.onLoad(function () {
 let debouncedArtistUpdate = betterncm.utils.debounce(() => {
     betterncm.utils.waitForElement(".name-artist").then(result => {
         const name = result.querySelector(".f-ust").innerText;
-        
+
         searchArtist(name).then(data => {
             // 防止快速切换时显示错误
             //if (url.hash != nowPage) return;
@@ -253,7 +254,7 @@ async function songDetails(data) {
     const date = new Date(data.song.publishDate);
     descriptions.push(text(`发布日期: ${date.getFullYear()}年${date.getMonth()+1}月${date.getDate()}日`), BR());
 
-    let info = await betterncm.utils.waitForElement("div[class='info']");
+    let info = await betterncm.utils.waitForElement(".inf > .info");
     let achievementsLine = dom('h2', {'class':['u-tit','f-ff2','f-thide','s-fc4']});
     achievementsLine.style.marginLeft = "0";
     achievementsLine.style.display = "flex";

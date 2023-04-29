@@ -29,3 +29,35 @@ export function getChineseNameFromNames(names, defaultName='') {
     }
     return defaultName;
 }
+
+export function createNode(html) { 
+    //const template = `<b>${html}</b>`;
+    let tempNode = document.createElement('div');
+    tempNode.innerHTML = html;
+    return tempNode.firstElementChild;
+}
+
+export function injectCSS() {
+    betterncm.utils.waitForElement("head").then((head) => {
+        head.appendChild(createNode(`
+        <style>
+            .vi-achievement {
+                display: flex;
+                justify-content: center;
+                vertical-align: middle;
+                align-items: center;
+                font-size: 10px;
+                border-radius: 20px;
+                height: 20px;
+                width: 60px;
+
+            }
+            .vi-achievement p {
+                margin: 0;
+                margin-left: 5px;
+                color: black;
+            }
+
+        `));
+    })
+}
