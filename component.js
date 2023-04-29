@@ -1,10 +1,10 @@
-import { createNode } from "./utils.js";
+import { htmlToNode, xss } from "./utils.js";
 
 function newAchievement(color, img, text) {
-    return createNode(`
-        <b class="vi-achievement f-ust f-ust-1" style="border: 1px solid ${color}; background-color: ${color}30">
-            <img src="${img}" width="16px" height="16px"/>
-            <p>${text}</p>
+    return htmlToNode(`
+        <b class="vi-achievement f-ust f-ust-1" style="border: 1px solid ${xss(color)}; background-color: ${color}30">
+            <img src="${xss(img)}" width="16px" height="16px"/>
+            <p>${xss(text)}</p>
         </b>
     `);
 }

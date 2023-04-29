@@ -30,16 +30,13 @@ export function getChineseNameFromNames(names, defaultName='') {
     return defaultName;
 }
 
-export function createNode(html) { 
-    //const template = `<b>${html}</b>`;
-    let tempNode = document.createElement('div');
-    tempNode.innerHTML = html;
-    return tempNode.firstElementChild;
+export function htmlToNode(html) { 
+    return dom('div', {innerHTML:html}).firstElementChild;
 }
 
 export function injectCSS() {
     betterncm.utils.waitForElement("head").then((head) => {
-        head.appendChild(createNode(`
+        head.appendChild(htmlToNode(`
         <style>
             .vi-achievement {
                 display: flex;
@@ -60,4 +57,15 @@ export function injectCSS() {
 
         `));
     })
+}
+
+export function xss(str) {
+    const map = {
+        '<': '&lt;',
+        '>': '&gt;',
+        '&': '&amp;',
+        '\"': '&quot;',
+        '\'': '&#39;'
+    };
+    return str.replace(/[<>&"']/g, (m) => map[m]);
 }
