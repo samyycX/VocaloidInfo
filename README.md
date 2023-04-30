@@ -1,6 +1,9 @@
 # VocaloidInfo
 基于BetterNCM的通过VocaDB/Bilibili获取vocaloid歌曲数据并显示的网易云插件
 
+# 使用方法
+成功安装插件后，打开歌曲页或歌手页，等待一会后自动获取信息并显示
+
 # 功能
 - 显示P主的信息
 - 显示歌姬的信息
