@@ -1,3 +1,4 @@
 interface VIRenderer {
-    render(): Promise<void>;
+    renderSong(): Promise<void>;
+    renderArtist(): Promise<void>;
 }

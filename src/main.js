@@ -19,15 +19,28 @@ plugin.onLoad( () => {
         }
     }).observe(document.body, {childList: true});
 
-    // 切换歌曲页
-    //new MutationObserver((records, observer) => {
-    //    betterncm.utils.debounce(updateSong, 400)();
-    //}).observe(document.body.querySelector("div[class='name f-thide s-fc1 j-flag']"), {childList: true});
+    //切换歌曲页
+    betterncm.utils.waitForElement("div[class='name f-thide s-fc1 j-flag']").then(result => {
+        new MutationObserver((records, observer) => {
+            betterncm.utils.debounce(updateSong, 400)();
+        }).observe(document.body.querySelector("div[class='name f-thide s-fc1 j-flag']"), {childList: true});
+    });
+    
+
+    // 打开/切换歌手页
+    window.addEventListener("hashchange", event => {
+        const url = new URL(event.newURL);
+        if (url.hash.startsWith("#/m/artist/?")) {
+            betterncm.utils.debounce(updateArtist, 400)();
+        }
+    });
 
 } );
 
 const updateSong = async () => {
-    console.log(2);
     Compatibility.renderSong();
-    console.log("2end");
+}
+
+const updateArtist = async () => {
+    Compatibility.renderArtist();
 }

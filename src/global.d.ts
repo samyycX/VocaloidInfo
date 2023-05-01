@@ -1,3 +1,8 @@
+declare module '*.css' {
+    const content: any;
+    export default content;
+}
+
 declare module "betterncm-api/fs" {
     /**
      * 和外界的文件系统进行交互的接口

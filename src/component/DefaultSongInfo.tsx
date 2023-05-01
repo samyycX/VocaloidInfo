@@ -1,10 +1,14 @@
 import { Store } from "redux";
+import { SongAction, SongActionType } from "../redux/SongInfoStore";
 
-interface Props {
-  vocadbData: any,
-  bilibiliData?: any
-};
-export default class DefaultSongInfo extends React.Component<{store: Store}> {
+export default class DefaultSongInfo extends React.Component<{store: Store<SongAction>}> {
+
+  divRef!: React.RefObject<HTMLDivElement>
+
+  constructor(props) {
+    super(props);
+    this.divRef = React.createRef();
+  }
 
   componentDidMount(): void {
     this.props.store.subscribe(() => {
@@ -12,24 +16,20 @@ export default class DefaultSongInfo extends React.Component<{store: Store}> {
     });
   }
 
-
   render() {
     //拆包redux store的数据
     const action = this.props.store.getState();
 
-    if (action.type == "loading" || action.type == "failed") {
+    if (action.type == SongActionType.LOADING || action.type == SongActionType.FAILED) {
       return <></>
     }
     
-    console.log(action);
     const vocadbData = action.data.vocadbData;
     const bilibiliData = action.data.bilibiliData;
     const publishDate = new Date(vocadbData.song.publishDate);
 
-    console.log('vocadb:'+vocadbData);
-
     return (
-      <div className="vi-hidden-item" hidden={true} >
+      <div className="vi-song-info vi-hidden-item" hidden ref={this.divRef} >
         <span>歌曲类型: { vocadbData.song.songType }</span>
         <br />
         <span>发布日期: { publishDate.getFullYear() }年{ publishDate.getMonth()+1 }月{ publishDate.getDate() }日</span>
