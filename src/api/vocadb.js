@@ -7,7 +7,7 @@ async function get(url) {
 
 export async function searchArtist(name) {
     let id = await getArtistIdByName(name);
-    if (id == 0) return 0;
+    if (id == 0) return undefined;
     return await get(`artists/${id}/details`);
 }
 

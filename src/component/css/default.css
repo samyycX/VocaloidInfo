@@ -1,0 +1,4 @@
+.vi-song-info span {
+    user-select: text;
+    -webkit-user-select: text;
+}
