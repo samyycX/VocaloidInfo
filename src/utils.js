@@ -6,3 +6,14 @@ export const getChineseName = (names, defaultName='')  => {
     }
     return defaultName;
 }
+
+export function xss(str) {
+    const map = {
+        '<': '&lt;',
+        '>': '&gt;',
+        '&': '&amp;',
+        '\"': '&quot;',
+        '\'': '&#39;'
+    };
+    return str.replace(/[<>&"']/g, (m) => map[m]);
+}

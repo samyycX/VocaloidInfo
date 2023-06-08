@@ -13,7 +13,7 @@ export default class DefaultArtistInfo extends DefaultInfo<ArtistAction> {
             return <></>
         }
 
-        return (<div className='vi-artist-info vi-hidden-item' hidden ref={ this.hiddenRef } >
+        return (<dd className='vi-artist-info vi-hidden-item' hidden ref={ this.hiddenRef } >
             { (() => {
             switch (action.artistType) {
                 case ArtistType.PRODUCER:
@@ -24,7 +24,7 @@ export default class DefaultArtistInfo extends DefaultInfo<ArtistAction> {
                     return <DefaultInfo2 { ...action.data } />
                 }
             } )() }
-        </div>)
+        </dd>)
 
         
     }
@@ -43,25 +43,27 @@ const ProducerInfo = (data) => {
         <br />
         <br />
         <span>作品排名TOP5 (VocaDB)</span>
-        {
+        <br />
+        <> { 
             (() => {
-                const topSongs = vocadbData.topSongs.slice(0,5);
-                let i = 0;
-                for ( let song of topSongs ) {
-                    return (<>
-                        <a onClick={() => { window.location.href = `#/m/search/?type=1&s=${ song.defaultName }&logsource=typing&position=1` }}>点击搜索</a>
-                        <span>{i} {utils.getChineseName(song.additionalNames, song.defaultName)}</span>
+                let list: JSX.Element[] = [];
+                vocadbData.topSongs.slice(0,5).forEach((song, index) => {
+                    list.push((<>
+                        <a onClick={() => {window.location.href = `#/m/search/?type=1&s=${song.defaultName}&logsource=typing&position=1`}}>点击搜索 </a>
+                        <span> { index+1 }. {utils.getChineseName(song.additionalNames, song.defaultName)}</span>
                         <br></br>
-                    </>)
-                }
+                    </>))
+                });
+                return list;
             })()
         }
+        </>
         <br />
         <span>使用声库（前三）</span>
         <br />
         {
             vocadbData.advancedStats.topVocaloids.slice(0,3).forEach((vocaloid) => {
-                <span>{ vocaloid.data.name } - 使用次数: { vocaloid.count }</span>
+                return <span>{ vocaloid.data.name } - 使用次数: { vocaloid.count }</span>
             })
         }
         <br />
@@ -78,19 +80,17 @@ const VocaloidInfo = (data) => {
         <br />
         {
             (() => {
+                let list: JSX.Element[] = [];
                 if (vocadbData.childVoicebanks) {
-                    return (<>
-                        <span>所有子声库</span>
-                        {
-                            vocadbData.childVoicebanks?.forEach((voicebank) => {
-                                <>
-                                    <span>{ voicebank.name }</span>
-                                    <br />
-                                </>
-                            })
-                        }
-                    </>)
+                    list.push(<span>所有子声库</span>);
+                    vocadbData.childVoicebanks?.forEach((voicebank) => {
+                        list.push(<>
+                            <span>{ voicebank.name }</span>
+                            <br />
+                        </>)
+                    })
                 }
+                return list;
             })()
         }
         <br />
@@ -109,19 +109,20 @@ const VocaloidInfo = (data) => {
         <br />
         <span>作品排名TOP5 (VocaDB)</span>
         <br />
-        {
+        <> { 
             (() => {
-                const topSongs = vocadbData.topSongs.slice(0,5);
-                let i = 0;
-                for ( let song of topSongs ) {
-                    return (<>
-                        <a onClick={() => {window.location.href = `#/m/search/?type=1&s=${song.defaultName}&logsource=typing&position=1`}}>点击搜索</a>
-                        <span>{i} {utils.getChineseName(song.additionalNames, song.defaultName)}</span>
+                let list: JSX.Element[] = [];
+                vocadbData.topSongs.slice(0,5).forEach((song, index) => {
+                    list.push((<>
+                        <a onClick={() => {window.location.href = `#/m/search/?type=1&s=${song.defaultName}&logsource=typing&position=1`}}>点击搜索 </a>
+                        <span> { index+1 }. {utils.getChineseName(song.additionalNames, song.defaultName)}</span>
                         <br></br>
-                    </>)
-                }
+                    </>))
+                });
+                return list;
             })()
         }
+        </>
         <br />
         <span>简介: { vocadbData.description.original }</span>
     </>)

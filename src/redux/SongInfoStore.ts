@@ -16,13 +16,13 @@ export enum SongActionType {
     ALL = LOADING | LOADED | FAILED
 }
 
-export interface SongAction extends Action  {
-    type: SongActionType,
-    data: {
-        vocadbData: any,
-        bilibiliData?: any
+    export interface SongAction extends Action  {
+        type: SongActionType,
+        data: {
+            vocadbData: any,
+            bilibiliData?: any
+        }
     }
-}
 const reducer = ( _, action: SongAction) => {
     return action;
 }

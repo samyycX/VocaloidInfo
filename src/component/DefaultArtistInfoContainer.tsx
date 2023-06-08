@@ -6,21 +6,15 @@ import DefaultContainer from "./DefaultContainer";
 // extends React.Component<{store: Store}>
 export default class DefaultArtistInfoContainer extends DefaultContainer<ArtistAction> {
 
-    constructor(props) {
-        super(props);
-        console.log(props);
-        console.log(super.props);
-    }
-
     render() {
 
         const store = this.props.store;
         const action = store.getState();
 
         if (action.type == ArtistActionType.LOADING) {
-            return <span>{ "[VocaloidInfo] 正在获取中, 请稍后.." }</span>
+            return <dd>{ "[VocaloidInfo] 正在获取中, 请稍后.." }</dd>
         } else if (action.type == ArtistActionType.FAILED) {
-            return <></>
+            return <div></div>
         }
 
         return (

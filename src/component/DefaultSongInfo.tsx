@@ -1,20 +1,7 @@
-import { Store } from "redux";
 import { SongAction, SongActionType } from "../redux/SongInfoStore";
+import DefaultInfo from "./DefaultInfo";
 
-export default class DefaultSongInfo extends React.Component<{store: Store<SongAction>}> {
-
-  divRef!: React.RefObject<HTMLDivElement>
-
-  constructor(props) {
-    super(props);
-    this.divRef = React.createRef();
-  }
-
-  componentDidMount(): void {
-    this.props.store.subscribe(() => {
-      this.forceUpdate();
-    });
-  }
+export default class DefaultSongInfo extends DefaultInfo<SongAction> {
 
   render() {
     //拆包redux store的数据
@@ -24,26 +11,25 @@ export default class DefaultSongInfo extends React.Component<{store: Store<SongA
       return <></>
     }
     
-    const vocadbData = action.data.vocadbData;
-    const bilibiliData = action.data.bilibiliData;
+    const { vocadbData, bilibiliData } = action.data;
     const publishDate = new Date(vocadbData.song.publishDate);
 
     return (
-      <div className="vi-song-info vi-hidden-item" hidden ref={this.divRef} >
+      <dd className="vi-song-info vi-hidden-item" hidden ref={ this.hiddenRef } >
         <span>歌曲类型: { vocadbData.song.songType }</span>
         <br />
         <span>发布日期: { publishDate.getFullYear() }年{ publishDate.getMonth()+1 }月{ publishDate.getDate() }日</span>
         <br />
         {
           vocadbData.alternateVersions.forEach((version) => {
-            <span>
+            return (<span>
               { version.name } ( { version.songType } - { version.artistString } )
-            </span>
+            </span>)
           })
         }
         {
           ((bilibiliData) => {
-            if (bilibiliData != undefined) {
+            if (bilibiliData) {
               let data = bilibiliData.data;
               return (
                 <>
@@ -55,7 +41,7 @@ export default class DefaultSongInfo extends React.Component<{store: Store<SongA
                   <br />
                   {
                     data.honor_reply.honor.forEach(honor => {
-                      <span>{ honor }</span>
+                      return <span>{ honor }</span>
                     })
                   }
                 </>
@@ -63,7 +49,7 @@ export default class DefaultSongInfo extends React.Component<{store: Store<SongA
             }
           })(bilibiliData)
         }
-      </div>
+      </dd>
     )
   }
 }
