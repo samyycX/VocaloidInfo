@@ -1,4 +1,27 @@
+.vi-control {
+    margin-top: 10px;
+}
+
 .vi-song-info span {
     user-select: text;
     -webkit-user-select: text;
+    font-size: 13px;
+    font-family: "Microsoft Yahei", arial, helvetica, sans-serif, simsun;
+}
+
+.vi-achievement {
+    display: flex;
+    justify-content: center;
+    vertical-align: middle;
+    align-items: center;
+    font-size: 10px;
+    border-radius: 20px;
+    height: 20px;
+    width: 60px;
+
+}
+.vi-achievement p {
+    margin: 0;
+    margin-left: 5px;
+    color: black;
 }

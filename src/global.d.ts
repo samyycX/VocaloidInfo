@@ -189,6 +189,10 @@ declare module "betterncm-api/utils" {
             settings: any,
             ...children: HTMLElement[]
         ): HTMLElement;
+        function debounce<T>(
+            func: () => T,
+            ms?: number,
+        ): () => T;
     }
 }
 declare module "betterncm-api/index" {

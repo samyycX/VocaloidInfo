@@ -5,7 +5,7 @@ export default class DefaultDataGetter implements DataGetter {
 
     async getSongDataFromPage() {
 
-        let title: HTMLElement = await betterncm.utils.waitForElement('span[class="name j-flag"]') as HTMLElement;
+        const title: HTMLElement = await betterncm.utils.waitForElement('span[class="name j-flag"]') as HTMLElement;
         //let artists = await betterncm.utils.waitForElement('li[class="f-thide f-ust f-ust-1"]');
         const name = title.innerText!.replace(/(\s*$)/g, "");
         const data = await VocaDB.searchSong(name);
@@ -24,14 +24,12 @@ export default class DefaultDataGetter implements DataGetter {
             }
         }
         
-        return {vocadbData: data, bilibiliData: undefined};
+        return { vocadbData: data, bilibiliData: undefined };
     }
 
     async getArtistDataFromPage() {
         let node1 = (await betterncm.utils.waitForElement(".name-artist > .f-brk > .f-ust")) as HTMLElement;
-        console.log(node1);
-        console.log(node1.innerText);
-
+      
         return { vocadbData: await VocaDB.searchArtist(node1.innerText) };
     }
 

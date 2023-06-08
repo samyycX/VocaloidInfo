@@ -5,25 +5,26 @@ import DefaultSongInfoContainer from '../../component/DefaultSongInfoContainer';
 import DefaultDataGetter from './DefaultDataGetter';
 import { ArtistActionType, ArtistInfoStore } from '../../redux/ArtistInfoStore';
 import DefaultArtistInfoContainer from '../../component/DefaultArtistInfoContainer';
+import DefaultSongAchievementContainer from '../../component/DefaultSongAchievementContainer';
 
 export default class DefaultRenderer implements VIRenderer {
 
     dataGetter: DataGetter;
     songComponentInitialized: boolean;
-    artistComponentInitialized: boolean
 
     constructor() {
         this.dataGetter = new DefaultDataGetter();
     }
 
     async renderSong(): Promise<void> {
-
         // 先把store的状态更新为正在获取中
         SongInfoStore.dispatch( {type: SongActionType.LOADING } );
         
         const data = await this.dataGetter.getSongDataFromPage();
+
         if (data.vocadbData == undefined) {
             SongInfoStore.dispatch( {type: SongActionType.FAILED } );
+            return;
         }
 
         SongInfoStore.dispatch( { type: SongActionType.LOADED , data: data } )
@@ -34,17 +35,25 @@ export default class DefaultRenderer implements VIRenderer {
             const mountPoint = betterncm.utils.dom('div', {});
             fatherNode!.insertBefore(mountPoint, fatherNode!.firstChild);
             ReactDOM.render(<DefaultSongInfoContainer { ...{store: SongInfoStore} } />, mountPoint);
+
             this.songComponentInitialized = true;
         }
 
-        
-        return;
+        let achiFatherNode = await betterncm.utils.waitForElement(".inf > .info");
+        const achiMountPoint = betterncm.utils.dom('div', {});
+        achiFatherNode!.insertBefore(achiMountPoint, achiFatherNode!.firstChild)
+        ReactDOM.render(<DefaultSongAchievementContainer { ...{ store: SongInfoStore } } />, achiMountPoint)
 
     }
 
     async renderArtist(): Promise<void> {
-       
+
         ArtistInfoStore.dispatch( { type: ArtistActionType.LOADING } );
+
+        const fatherNode = await betterncm.utils.waitForElement(".m-info-artist");
+        const mountPoint = betterncm.utils.dom('div', {});
+        fatherNode?.appendChild(mountPoint);
+        ReactDOM.render(<DefaultArtistInfoContainer { ...{ store: ArtistInfoStore } } />, mountPoint);       
 
         const data = await this.dataGetter.getArtistDataFromPage();
 
@@ -54,14 +63,6 @@ export default class DefaultRenderer implements VIRenderer {
         }
 
         ArtistInfoStore.dispatch( { type: ArtistActionType.LOADED, data: data } );
-
-        if (!this.artistComponentInitialized) {
-            const fatherNode = await betterncm.utils.waitForElement(".m-info-artist");
-            const mountPoint = betterncm.utils.dom('div', {});
-            fatherNode?.appendChild(mountPoint);
-            ReactDOM.render(<DefaultArtistInfoContainer { ...{ store: ArtistInfoStore } } />, mountPoint);
-            this.artistComponentInitialized = true;
-        }
 
 
     }

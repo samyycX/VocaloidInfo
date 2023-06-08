@@ -1,5 +1,4 @@
 import DefaultRenderer from "./default/DefaultRenderer";
-import * as vocadb from '../api/vocadb.js';
 import DefaultCSSInjector from "./default/DefaultCSSInjector";
 
 export default class CompatibilityClass {
@@ -13,7 +12,6 @@ export default class CompatibilityClass {
         this.renderer = new DefaultRenderer();
         this.cssInjector = new DefaultCSSInjector();
 
-        console.log("INJECT");
         this.cssInjector.inject();
         
     }
