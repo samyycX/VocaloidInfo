@@ -20,7 +20,9 @@ export enum SongActionType {
         type: SongActionType,
         data: {
             vocadbData: any,
-            bilibiliData?: any
+            bilibiliData?: any,
+            youtubeData?: any,
+            niconicoData?: any
         }
     }
 const reducer = ( _, action: SongAction) => {

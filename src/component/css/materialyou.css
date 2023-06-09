@@ -1,0 +1,11 @@
+#vi-control, #vi-control span, #vi-control a {
+    color: var(--md-accent-color-secondary);
+}
+
+.vi-song-info span {
+    color: var(--md-accent-color-secondary);
+}
+
+.vi-artist-info span, .vi-artist-info a {
+    color: var(--md-accent-color-secondary);
+}

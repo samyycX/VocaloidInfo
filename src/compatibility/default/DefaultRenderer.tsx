@@ -10,7 +10,7 @@ import DefaultSongAchievementContainer from '../../component/DefaultSongAchievem
 export default class DefaultRenderer implements VIRenderer {
 
     dataGetter: DataGetter;
-    songComponentInitialized: boolean;
+    songComponentsRendered = false;
 
     constructor() {
         this.dataGetter = new DefaultDataGetter();
@@ -30,13 +30,13 @@ export default class DefaultRenderer implements VIRenderer {
         SongInfoStore.dispatch( { type: SongActionType.LOADED , data: data } )
 
         // 第一次挂载React组件，之后使用redux store更新状态
-        if (!this.songComponentInitialized) {
+        if (!this.songComponentsRendered) {
             let fatherNode = await betterncm.utils.waitForElement('div[class="m-comment m-comment-play"]');
             const mountPoint = betterncm.utils.dom('div', {});
             fatherNode!.insertBefore(mountPoint, fatherNode!.firstChild);
             ReactDOM.render(<DefaultSongInfoContainer { ...{store: SongInfoStore} } />, mountPoint);
 
-            this.songComponentInitialized = true;
+            this.songComponentsRendered = true;
         }
 
         let achiFatherNode = await betterncm.utils.waitForElement(".inf > .info");

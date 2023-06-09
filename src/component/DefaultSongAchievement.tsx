@@ -14,7 +14,7 @@ export const DefaultSongAchievement: React.FC<Attr> = ({color, icon_url, text}) 
         marginRight: '5px'
     }}>
         <img src={ `${xss(icon_url)}` } width="16px" height="16px"/>
-        <p>{xss(text)}</p>    
+        <p style={{ color: `${xss(color)}` }}>{xss(text)}</p>    
     </b>
     )
 }

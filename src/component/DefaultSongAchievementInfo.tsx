@@ -10,6 +10,17 @@ const YOUTUBE_ICO = "https://vocadb.net/Content/youtube.png";
 const NICO_ICO = "https://vocadb.net/Content/nico.png";
 const BILI_ICO = "https://www.bilibili.com/favicon.ico";
 
+const formatNumber = (num: number) => {
+    if (num >= 100000000) {
+        return `${Math.floor(num / 1000000) / 100} 亿`
+        // 12345678
+    } else if (num >= 1000000) {
+        return `${Math.floor(num / 100) / 100} 万`
+    } else {
+        return num.toString();
+    }
+}
+
 export default class DefaultSongAchievementInfo extends DefaultInfo<SongAction> {
 
     render() {
@@ -19,71 +30,75 @@ export default class DefaultSongAchievementInfo extends DefaultInfo<SongAction> 
             return <div></div>
         }
 
-        const { vocadbData, bilibiliData } = action.data;
-        const publishDate = new Date(vocadbData.song.publishDate);
+        const { vocadbData, bilibiliData, youtubeData, niconicoData } = action.data;
 
         let list: JSX.Element[] = []
-        vocadbData.pools.forEach(pool => {
-            switch (pool.id) {
-                case 30:
-                    list.push(<DefaultSongAchievement {...{
-                        color: CHUANSHUO,
-                        icon_url: NICO_ICO,
-                        text: "传说"
-                    }} />);
-                    break;
-                case 2665:
-                    list.push(<DefaultSongAchievement {...{
-                        color: CHUANSHUO,
-                        icon_url: YOUTUBE_ICO,
-                        text: "传说"
-                    }} />);
-                    break;
-                case 6477:
-                    list.push(<DefaultSongAchievement {...{
-                        color: SHENHUA,
-                        icon_url: NICO_ICO,
-                        text: "神话"
-                    }} />);
-                    break;
-                case 6478:
-                    list.push(<DefaultSongAchievement {...{
-                        color: SHENHUA,
-                        icon_url: YOUTUBE_ICO,
-                        text: "传说"
-                    }} />);
-                    break;
-            }
-        })
+        let nView: number = niconicoData ? niconicoData?.data[0].viewCounter : 0;
+        let yView: number = youtubeData ? parseInt(youtubeData?.items[0].statistics.viewCount) : 0;
+        let bView: number = bilibiliData ?bilibiliData?.data.stat.view : 0;
+
+        let formattedNView = formatNumber(nView);
+        let formattedYView = formatNumber(yView);
+        let formattedBView = formatNumber(bView);
+
+        if (nView >= 10000000) {
+            list.push(<DefaultSongAchievement {...{
+                color: SHENHUA,
+                icon_url: NICO_ICO,
+                text: formattedNView
+            }} />);
+        } else if ( nView >= 1000000) {
+            list.push(<DefaultSongAchievement {...{
+                color: CHUANSHUO,
+                icon_url: NICO_ICO,
+                text: formattedNView
+            }} />);
+        } else if ( nView >= 100000 ) {
+            list.push(<DefaultSongAchievement {...{
+                color: DIANTANG,
+                icon_url: NICO_ICO,
+                text: formattedNView
+            }} />);
+        }
+
+        if ( yView >= 10000000 ) {
+            list.push(<DefaultSongAchievement {...{
+                color: SHENHUA,
+                icon_url: YOUTUBE_ICO,
+                text: formattedYView
+            }} />);
+        } else if ( yView >= 1000000 ) {
+            list.push(<DefaultSongAchievement {...{
+                color: CHUANSHUO,
+                icon_url: YOUTUBE_ICO,
+                text: formattedYView
+            }} />);
+        } else if ( yView >= 100000 ) {
+            list.push(<DefaultSongAchievement {...{
+                color: DIANTANG,
+                icon_url: YOUTUBE_ICO,
+                text: formattedYView
+            }} />);
+        }
         
-        // bilibili
-        if (bilibiliData != undefined) {
-            let view = bilibiliData.data.stat.view;
-            if (view >= 10000000) {
-                list.push(<DefaultSongAchievement {...{
-                    color: SHENHUA,
-                    icon_url: BILI_ICO,
-                    text: `播放量 ${view} (神话)`
-                }} />)
-            } else if (view >= 1000000) {
-                list.push(<DefaultSongAchievement {...{
-                    color: CHUANSHUO,
-                    icon_url: BILI_ICO,
-                    text: `播放量 ${view} (传说)`
-                }} />);
-            } else if (view >= 100000) {
-                list.push(<DefaultSongAchievement {...{
-                    color: DIANTANG,
-                    icon_url: BILI_ICO,
-                    text: `播放量 ${view} (殿堂)`
-                }} />);
-            } else {
-                list.push(<DefaultSongAchievement {...{
-                    color: DIANTANG,
-                    icon_url: BILI_ICO,
-                    text: `播放量 ${view}`
-                }} />);
-            }
+        if (bView >= 10000000) {
+            list.push(<DefaultSongAchievement {...{
+                color: SHENHUA,
+                icon_url: BILI_ICO,
+                text: formattedBView
+            }} />)
+        } else if (bView >= 1000000) {
+            list.push(<DefaultSongAchievement {...{
+                color: CHUANSHUO,
+                icon_url: BILI_ICO,
+                text: formattedBView
+            }} />);
+        } else if (bView >= 100000) {
+            list.push(<DefaultSongAchievement {...{
+                color: DIANTANG,
+                icon_url: BILI_ICO,
+                text: formattedBView
+            }} />);
         }
         return (<>{ list.length > 0 ? list : <div></div> }</>)
     }
