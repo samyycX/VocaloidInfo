@@ -1,5 +1,7 @@
 const BASE_URL = "https://vocadb.net/api/"
 
+const SPECIAL_NAME_BASE_URL="https://api.tyfans.net/vocaloidinfo/specialSongName"
+
 async function get(url) {
     const response = await fetch(BASE_URL+url);
     return response.json();
@@ -15,6 +17,11 @@ export async function searchSong(name, artistsName) {
 
     let result = /(.*)(\(|\[|【).*(\)|\]|】)/g.exec(name);
     let raw_name = result == null ? name : result[1];
+
+    let specialdata = await (await fetch(SPECIAL_NAME_BASE_URL+`?name=${name}`)).json();
+    if (specialdata.found) {
+        return specialdata.id;
+    }
 
     let url = `songs?query=${raw_name}&sort=SongType&childVoicebanks=true&nameMatchMode=Partial`;
     const datas = await get(url);
