@@ -14,6 +14,7 @@ export default class DefaultArtistInfo extends DefaultInfo<ArtistAction> {
         }
 
         return (<dd className='vi-artist-info vi-hidden-item' hidden ref={ this.hiddenRef } >
+            <br />
             { (() => {
             switch (action.artistType) {
                 case ArtistType.PRODUCER:
@@ -82,7 +83,7 @@ const VocaloidInfo = (data) => {
             (() => {
                 let list: JSX.Element[] = [];
                 if (vocadbData.childVoicebanks) {
-                    list.push(<span>所有子声库</span>);
+                    list.push(<span>所有子声库</span>, <br/>);
                     vocadbData.childVoicebanks?.forEach((voicebank) => {
                         list.push(<>
                             <span>{ voicebank.name }</span>
@@ -106,6 +107,7 @@ const VocaloidInfo = (data) => {
         <span>总专辑数: { vocadbData.sharedStats.albumCount}</span>
         <br />
         <span>总歌曲数: { vocadbData.sharedStats.songCount }</span>
+        <br />
         <br />
         <span>作品排名TOP5 (VocaDB)</span>
         <br />

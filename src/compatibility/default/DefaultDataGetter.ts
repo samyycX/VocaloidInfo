@@ -1,5 +1,7 @@
 import * as VocaDB from '../../api/vocadb.js';
 import * as Bilibili from '../../api/bilibili.js';
+import * as Youtube from '../../api/youtube.js';
+import * as Niconico from '../../api/niconico.js';
 
 export default class DefaultDataGetter implements DataGetter {
 
@@ -15,16 +17,31 @@ export default class DefaultDataGetter implements DataGetter {
         }
 
         var bilibiliData: any = undefined;
+        var youtubeData: any = undefined;
+        var niconicoData: any = undefined;
         // 检查歌曲是否有b站的数据
         for (let pv of data.pvs) {
-            if (pv.service == "Bilibili") {
-                const av = pv.url.split("/").slice(-1)[0];
-                bilibiliData = await Bilibili.searchVideo(av);
-                return {vocadbData: data, bilibiliData: bilibiliData};
-            }
+            switch (pv.service) {
+                case "Bilibili":
+                    const av = pv.pvId;
+                    bilibiliData = await Bilibili.searchVideo(av);
+                    break;
+                case "Youtube":
+                    const ytid = pv.pvId;
+                    youtubeData = await Youtube.getYoutubeData(ytid);
+                    break;
+                case "NicoNicoDouga":
+                    const nid = pv.pvId;
+                    niconicoData = await Niconico.getNiconicoData(nid);
+                    break;
+            } 
         }
         
-        return { vocadbData: data, bilibiliData: undefined };
+        return { 
+            vocadbData: data, 
+            bilibiliData: bilibiliData, 
+            youtubeData: youtubeData, 
+            niconicoData: niconicoData };
     }
 
     async getArtistDataFromPage() {

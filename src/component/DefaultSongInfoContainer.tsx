@@ -11,7 +11,7 @@ export default class DefaultSongInfoContainer extends DefaultContainer<SongActio
         const action = store.getState();
 
         if (action.type == SongActionType.LOADING) {
-            return <span>{ "[VocaloidInfo] 正在获取中, 请稍后.." }</span>
+            return <span id="vi-control">{ "VocaloidInfo插件正在获取信息中, 请稍后.." }</span>
         } else if (action.type == SongActionType.FAILED) {
             return <div></div>
         }
