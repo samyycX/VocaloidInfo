@@ -30,6 +30,7 @@ const reducer = ( _, action: ArtistAction) => {
             case "Vocaloid":
             case "SynthesizerV":
             case "CeVIO":
+            case "UTAU":
                 action.artistType = ArtistType.VOCALOID;
                 break;
             default:

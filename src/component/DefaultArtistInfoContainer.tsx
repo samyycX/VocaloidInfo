@@ -12,14 +12,14 @@ export default class DefaultArtistInfoContainer extends DefaultContainer<ArtistA
         const action = store.getState();
 
         if (action.type == ArtistActionType.LOADING) {
-            return <dd id="vi-control">{ "VocaloidInfo插件正在获取信息中, 请稍后.." }</dd>
+            return <dd id="vi-artist-control">{ "VocaloidInfo插件正在获取信息中, 请稍后.." }</dd>
         } else if (action.type == ArtistActionType.FAILED) {
-            return <div></div>
+            return <dd id="vi-artist-control">{ "VocaloidInfo未找到有关信息 (；д；)" }</dd>
         }
 
         return (
             <>
-            <dd id="vi-control" ref={ this.controlRef } >
+            <dd id="vi-artist-control" ref={ this.controlRef } >
                 <span>在VocaDB中查找到记录 </span>
                 <a onClick={ () => this.switchHidden(this) } >查看信息</a>
             </dd>

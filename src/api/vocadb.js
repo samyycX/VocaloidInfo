@@ -15,7 +15,7 @@ export async function searchArtist(name) {
 
 export async function searchSong(name, artistsName) {
 
-    let result = /(.*)(\(|\[|【).*(\)|\]|】)/g.exec(name);
+    let result = /(.*)(\(|\[|【|（).*(\)|\]|】|）)/g.exec(name);
     let raw_name = result == null ? name : result[1];
 
     let specialdata = await (await fetch(SPECIAL_NAME_BASE_URL+`?name=${name}`)).json();
@@ -24,25 +24,27 @@ export async function searchSong(name, artistsName) {
     }
 
     let url = `songs?query=${raw_name}&sort=SongType&childVoicebanks=true&nameMatchMode=Partial`;
-    const datas = await get(url);
-    if (datas.items[0] == undefined) return undefined;
-    return getSongById(datas.items[0].id);
 
-    //暂时停用此功能
-    /*
-    // 获取歌的原名 (删除feat. remix等等信息)
-    
-
-    let url = `songs?query=${name}&sort=SongType&childVoicebanks=true&nameMatchMode=Partial`;
-    // 暂时截取前4个作者名
-    artistsName = artistsName.slice(0,4);
-
+    artistsName = artistsName.slice(0,2);
     for (let artistName of artistsName) {
         let id = await getArtistIdByName(artistName);
         if (id != 0) {
             url += `&artistId%5B%5D=${id}`
         }
     }
+    
+    const datas = await get(url);
+    if (datas.items[0] == undefined) return undefined;
+    return getSongById(datas.items[0].id);
+
+    //暂时停用此功能
+    /*
+
+    let url = `songs?query=${name}&sort=SongType&childVoicebanks=true&nameMatchMode=Partial`;
+    // 暂时截取前4个作者名
+    
+
+   
 
     console.log(url);
 

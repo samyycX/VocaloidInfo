@@ -11,14 +11,18 @@ export default class DefaultSongInfoContainer extends DefaultContainer<SongActio
         const action = store.getState();
 
         if (action.type == SongActionType.LOADING) {
-            return <span id="vi-control">{ "VocaloidInfo插件正在获取信息中, 请稍后.." }</span>
+            return <dd id="vi-song-control">
+                <span>{ "VocaloidInfo插件正在获取信息中, 请稍后.." }</span>
+            </dd>
         } else if (action.type == SongActionType.FAILED) {
-            return <div></div>
+            return <dd id="vi-song-control">
+            <span>{ "VocaloidInfo未找到有关信息 (；д；)" }</span>
+        </dd>
         }
 
         return (
             <>
-            <dd id="vi-control" ref={ this.controlRef }>
+            <dd id="vi-song-control" ref={ this.controlRef }>
                 <span>在VocaDB中查找到记录 </span>
                 <a onClick={ () => this.switchHidden(this) }>查看信息</a>
             </dd>
