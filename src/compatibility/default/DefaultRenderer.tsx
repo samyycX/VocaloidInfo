@@ -32,7 +32,7 @@ export default class DefaultRenderer implements VIRenderer {
         // 第一次挂载React组件，之后使用redux store更新状态
         if (!this.songComponentsRendered) {
             let fatherNode = await betterncm.utils.waitForElement('div[class="m-comment m-comment-play"]');
-            const mountPoint = betterncm.utils.dom('div', {});
+            const mountPoint = betterncm.utils.dom('div', { 'class': ['vi-song-container'] });
             fatherNode!.insertBefore(mountPoint, fatherNode!.firstChild);
             ReactDOM.render(<DefaultSongInfoContainer { ...{store: SongInfoStore} } />, mountPoint);
 
@@ -51,7 +51,7 @@ export default class DefaultRenderer implements VIRenderer {
         ArtistInfoStore.dispatch( { type: ArtistActionType.LOADING } );
 
         const fatherNode = await betterncm.utils.waitForElement(".m-info-artist");
-        const mountPoint = betterncm.utils.dom('div', {});
+        const mountPoint = betterncm.utils.dom('div', { 'class': ['vi-artist-container']});
         fatherNode?.appendChild(mountPoint);
         ReactDOM.render(<DefaultArtistInfoContainer { ...{ store: ArtistInfoStore } } />, mountPoint);       
 

@@ -1,4 +1,8 @@
-#vi-control, #vi-control span, #vi-control a {
+#vi-song-control, #vi-song-control span, #vi-song-control a {
+    color: var(--md-accent-color-secondary);
+}
+
+#vi-artist-control, #vi-artist-control span, #vi-artist-control a {
     color: var(--md-accent-color-secondary);
 }
 
@@ -8,4 +12,8 @@
 
 .vi-artist-info span, .vi-artist-info a {
     color: var(--md-accent-color-secondary);
+}
+
+.vi-song-container {
+    border-color: var(--md-accent-color-secondary);
 }

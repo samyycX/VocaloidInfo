@@ -1,7 +1,11 @@
 .vi-song-info span {
-    color: #111;
+    color: rgba(0,0,0,.8);
 }
 
-#vi-control, #vi-control span, #vi-control a {
-    color: #111;
+#vi-song-control, #vi-song-control span, #vi-song-control a {
+    color: rgba(0,0,0,.8);
+}
+
+.vi-song-container {
+    border-color:rgba(0,0,0,.8);
 }
