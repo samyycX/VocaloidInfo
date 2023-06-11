@@ -18,14 +18,13 @@ export async function searchSong(name, artistsName) {
     let result = /(.*)(\(|\[|【|（).*(\)|\]|】|）)/g.exec(name);
     let raw_name = result == null ? name : result[1];
 
-    let resp = await fetch(SPECIAL_NAME_BASE_URL+`specialSongName?name=${name}`).catch(err => {});
+    let resp = await fetch(SPECIAL_NAME_BASE_URL+`specialSongName?name=${encodeURI(name).replaceAll('%C2%A0','%20')}`).catch(err => {});
     if (resp != undefined) {
         let specialdata = await resp.json();
         if (specialdata.found) {
             return getSongById(specialdata.id);
         }
     }
-    
 
     let url = `songs?query=${raw_name}&sort=SongType&childVoicebanks=true&nameMatchMode=Partial`;
 
