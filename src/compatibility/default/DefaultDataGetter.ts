@@ -28,21 +28,46 @@ export default class DefaultDataGetter implements DataGetter {
         var bilibiliData: any = undefined;
         var youtubeData: any = undefined;
         var niconicoData: any = undefined;
+
         // 检查歌曲是否有b站的数据
         for (let pv of data.pvs) {
             if (pv.pvType == "Original") {
                 switch (pv.service) {
                     case "Bilibili":
                         const av = pv.pvId;
-                        bilibiliData = await Bilibili.searchVideo(av);
+                        let thisbdata = await Bilibili.searchVideo(av);
+                        if (bilibiliData != undefined && thisbdata != undefined) {
+                            if (thisbdata.data.stat.view > bilibiliData.data.stat.view) {
+                                bilibiliData = thisbdata
+                            }
+                        }
+                        if (bilibiliData == undefined) {
+                            bilibiliData = thisbdata
+                        }
                         break;
                     case "Youtube":
                         const ytid = pv.pvId;
-                        youtubeData = await Youtube.getYoutubeData(ytid);
+                        let thisydata = await Youtube.getYoutubeData(ytid);
+                        if (thisydata != undefined && youtubeData != undefined) {
+                            if (parseInt(thisydata.items[0].statistics.viewCount) > parseInt(youtubeData.items[0].statistics.viewCount)) {
+                                youtubeData = thisydata
+                            }
+                        }
+                        if (youtubeData == undefined) {
+                            youtubeData = thisydata
+                        }
                         break;
                     case "NicoNicoDouga":
                         const nid = pv.pvId;
-                        niconicoData = await Niconico.getNiconicoData(nid);
+                        let thisndata = await Niconico.getNiconicoData(nid);
+                        if (thisndata != undefined && niconicoData != undefined) {
+                            if (thisndata.data[0].viewCounter > niconicoData.data[0].viewCounter) {
+                                niconicoData = thisndata
+                            }
+                        }
+                        if (niconicoData == undefined) {
+                            niconicoData = thisndata
+                        }
                         break;
                 } 
             }
