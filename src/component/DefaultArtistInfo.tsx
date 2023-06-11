@@ -63,9 +63,14 @@ const ProducerInfo = (data) => {
         <span>使用声库（前三）</span>
         <br />
         {
-            vocadbData.advancedStats.topVocaloids.slice(0,3).forEach((vocaloid) => {
-                return <span>{ vocaloid.data.name } - 使用次数: { vocaloid.count }</span>
-            })
+            (() => {
+                let list: JSX.Element[] = []
+                vocadbData.advancedStats.topVocaloids.slice(0,3).forEach((vocaloid) => {
+                    list.push(<span>{ vocaloid.data.name } - 使用次数: { vocaloid.count }</span>, <br/>)
+               })
+               return list;
+            })()
+           
         }
         <br />
         <span>简介: { vocadbData.description?.original }</span>
