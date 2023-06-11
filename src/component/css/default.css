@@ -49,6 +49,7 @@
 .vi-achievement p {
     margin: 0;
     margin-left: 5px;
+    margin-top: 1px;
     filter: brightness(0.77);
 }
 

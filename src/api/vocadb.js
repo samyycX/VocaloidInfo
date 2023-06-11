@@ -1,6 +1,6 @@
 const BASE_URL = "https://vocadb.net/api/"
 
-const SPECIAL_NAME_BASE_URL="https://api.tyfans.net/vocaloidinfo/specialSongName"
+const SPECIAL_NAME_BASE_URL="https://api.tyfans.net/vocaloidinfo/"
 
 async function get(url) {
     const response = await fetch(BASE_URL+url);
@@ -18,10 +18,14 @@ export async function searchSong(name, artistsName) {
     let result = /(.*)(\(|\[|【|（).*(\)|\]|】|）)/g.exec(name);
     let raw_name = result == null ? name : result[1];
 
-    let specialdata = await (await fetch(SPECIAL_NAME_BASE_URL+`?name=${name}`)).json();
-    if (specialdata.found) {
-        return specialdata.id;
+    let resp = await fetch(SPECIAL_NAME_BASE_URL+`specialSongName?name=${name}`).catch(err => {});
+    if (resp != undefined) {
+        let specialdata = await resp.json();
+        if (specialdata.found) {
+            return specialdata.id;
+        }
     }
+    
 
     let url = `songs?query=${raw_name}&sort=SongType&childVoicebanks=true&nameMatchMode=Partial`;
 
@@ -59,6 +63,13 @@ export async function getSongById(id) {
 }
 
 export async function getArtistIdByName(name) {
+    let resp = await fetch(SPECIAL_NAME_BASE_URL+`specialArtistName?name=${name}`).catch(err => {});
+    if (resp != undefined) {
+        let specialdata = await resp.json()
+        if (specialdata.found) {
+            return specialdata.id;
+        }
+    }
     const datas = await get(`artists?query=${name}&allowBaseVoicebanks=true&childTags=false&start=0&maxResults=10&getTotalCount=false&preferAccurateMatches=false&lang=Default`);
     return datas.items[0] == undefined ? 0 : datas.items[0].id;
 }
