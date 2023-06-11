@@ -22,7 +22,7 @@ export async function searchSong(name, artistsName) {
     if (resp != undefined) {
         let specialdata = await resp.json();
         if (specialdata.found) {
-            return specialdata.id;
+            return getSongById(specialdata.id);
         }
     }
     
